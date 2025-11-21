@@ -1,9 +1,11 @@
 import React, { useRef } from 'react';
 import { TextField, Button, Container, Typography, Box } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Login() {
+  let navigate = useNavigate();
   let idRef = useRef(null);
+  let pwdRef = useRef();
   return (
     <Container maxWidth="xs">
       <Box
@@ -16,16 +18,39 @@ function Login() {
         <Typography variant="h4" gutterBottom>
           로그인
         </Typography>
-        <TextField inputRef={idRef} label="Email" variant="outlined" margin="normal" fullWidth />
+        <TextField inputRef={idRef} label="ID" variant="outlined" margin="normal" fullWidth />
         <TextField
           label="Password"
           variant="outlined"
           margin="normal"
           fullWidth
           type="password"
+          inputRef={pwdRef}
         />
         <Button onClick={()=>{
-          alert("로그인 클릭! " + idRef.current.value);
+          let param = {
+            userId : idRef.current.value,
+            pwd : pwdRef.current.value
+          };
+
+          fetch("http://localhost:3010/user/login", {
+                method : "POST",
+                headers : {
+                  "Content-type" : "application/json"
+                },
+                body : JSON.stringify(param)
+              })
+                .then(res => res.json())
+                .then(data => {
+                  console.log(data);
+                  alert(data.msg);
+                  if(data.result){
+                    navigate("/feed");      
+                  }
+                  
+
+                })
+
         }} variant="contained" color="primary" fullWidth style={{ marginTop: '20px' }}>
           로그인
         </Button>

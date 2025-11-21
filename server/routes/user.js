@@ -19,5 +19,32 @@ router.post("/join", async (req, res) => {
     }
 })
 
+router.post("/login", async (req, res) => {
+    let {userId, pwd} = req.body;
+    try {
+
+       let sql = "SELECT * FROM TBL_USER WHERE USERID = ?";
+       let [list] = await db.query(sql, [userId]);
+       let msg = "";
+       let result = false;
+       if(list.length > 0){ 
+        let match = await bcrypt.compare(pwd, list[0].pwd);
+        if(match){
+            msg = list[0].userName + "님 환영합니다!"
+            result = true;
+        } else {
+            msg = "패스워드를 확인해주세요."
+        }
+       } else {
+        msg = "아이디가 존재하지 않습니다."
+       }
+       res.json({
+        result : result,
+        msg : msg
+       });
+    } catch (error) {
+        console.log(error);
+    }
+})
 
 module.exports = router;
