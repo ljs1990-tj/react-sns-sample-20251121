@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { TextField, Button, Container, Typography, Box } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Join() {
+  let navigate = useNavigate();
+  let userId = useRef();
+  let pwd = useRef();
+  let userName = useRef();
   return (
     <Container maxWidth="xs">
       <Box
@@ -16,16 +20,44 @@ function Join() {
           회원가입
         </Typography>
         
-        <TextField label="ID" variant="outlined" margin="normal" fullWidth />
+        <TextField inputRef={userId} label="ID" variant="outlined" margin="normal" fullWidth />
         <TextField
           label="Password"
           variant="outlined"
           margin="normal"
           fullWidth
           type="password"
+          inputRef={pwd}
         />
-        <TextField label="Username" variant="outlined" margin="normal" fullWidth />
-        <Button variant="contained" color="primary" fullWidth style={{ marginTop: '20px' }}>
+        <TextField inputRef={userName} label="Username" variant="outlined" margin="normal" fullWidth />
+        <Button 
+            variant="contained" 
+            color="primary" 
+            fullWidth style={{ marginTop: '20px' }}
+            onClick={()=>{
+              let param = {
+                userId : userId.current.value,
+                pwd : pwd.current.value,
+                userName : userName.current.value
+              };
+
+              fetch("http://localhost:3010/user/join", {
+                method : "POST",
+                headers : {
+                  "Content-type" : "application/json"
+                },
+                body : JSON.stringify(param)
+              })
+                .then(res => res.json())
+                .then(data => {
+                  console.log(data);
+                  alert(data.msg);
+                  navigate("/");
+
+                })
+
+            }}
+        >
             회원가입
         </Button>
         <Typography variant="body2" style={{ marginTop: '10px' }}>
